@@ -508,12 +508,13 @@ class VaccinationHistoryView(viewsets.ReadOnlyModelViewSet):
         for age_group, min_age in AGE_GROUPS:
             if age_group in completed_age_groups:
                 age_groups_status.append({"age_group": age_group, "status": "Completed"})
-            elif not upcoming_detected and child_age_years < min_age:
+            elif not upcoming_detected and child_age_years >= min_age:
                 age_groups_status.append({"age_group": age_group, "status": "Missing"})
-                upcoming_detected = True
-            elif child_age_years >= min_age:
+            elif child_age_years < min_age:
                 age_groups_status.append({"age_group": age_group, "status": "Upcoming"})
+                upcoming_detected = True
                 break
+
         response_data = {
             "child_name": child.name,
             "age_groups": age_groups_status
