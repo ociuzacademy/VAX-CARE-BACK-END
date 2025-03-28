@@ -463,9 +463,9 @@ class ViewBookingHistoryView(viewsets.ReadOnlyModelViewSet):
 #         # Serialize the filtered queryset
 #         # serializer = StockSerializer(history, many=True)
 #         # return Response(serializer.data, status=status.HTTP_200_OK)
-# 
-from dateutil.relativedelta import relativedelta
-   
+        
+from datetime import date
+from django.utils.dateparse import parse_date
 
 class VaccinationHistoryView(viewsets.ReadOnlyModelViewSet):
     queryset = Booking.objects.all()
@@ -482,40 +482,38 @@ class VaccinationHistoryView(viewsets.ReadOnlyModelViewSet):
         except Child.DoesNotExist:
             return Response({"status": "failed", "message": "Child not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Define age group mappings in months
-        AGE_GROUPS = {
-            "6 Weeks": 1.5,
-            "10 Weeks": 2.5,
-            "14 Weeks": 3.5,
-            "9-12 Months": 12,
-            "16-24 Months": 24,
-            "5-6 Years": 72,
-            "10 Years": 120,
-            "16 Years": 192,
-        }
+        # Define age groups and their corresponding age range
+        AGE_GROUPS = [
+            ("6 Weeks", 0.115),       # 6/52 weeks = ~0.115 years
+            ("10 Weeks", 0.192),
+            ("14 Weeks", 0.269),
+            ("9-12 Months", 0.75),
+            ("16-24 Months", 1.33),
+            ("5-6 Years", 5),
+            ("10 Years", 10),
+            ("16 Years", 16)
+        ]
 
-        # Calculate child's age in months
+        # Calculate child's age in years
         today = date.today()
-        child_age_months = relativedelta(today, child.date_of_birth).years * 12 + relativedelta(today, child.date_of_birth).months
+        child_age_years = (today - child.birthdate).days / 365.25
 
-        # Get completed vaccinations
+        # Get completed bookings
         completed_bookings = Booking.objects.filter(child=child, status="success").values_list('age_group', flat=True)
         completed_age_groups = set(completed_bookings)
 
         age_groups_status = []
-        missing_detected = False
+        upcoming_detected = False  
 
-        for age_group, age_in_months in AGE_GROUPS.items():
-            if age_in_months <= child_age_months:
-                if age_group in completed_age_groups:
-                    age_groups_status.append({"age_group": age_group, "status": "Completed"})
-                else:
-                    age_groups_status.append({"age_group": age_group, "status": "Missing"})
-                    missing_detected = True
-            elif not missing_detected:
+        for age_group, min_age in AGE_GROUPS:
+            if age_group in completed_age_groups:
+                age_groups_status.append({"age_group": age_group, "status": "Completed"})
+            elif not upcoming_detected and child_age_years >= min_age:
                 age_groups_status.append({"age_group": age_group, "status": "Upcoming"})
-                missing_detected = True  # Mark the first upcoming vaccination and stop
-                break  
+                upcoming_detected = True
+                break
+            elif child_age_years < min_age:
+                age_groups_status.append({"age_group": age_group, "status": "Missing"})
 
         response_data = {
             "child_name": child.name,
