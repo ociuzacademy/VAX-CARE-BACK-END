@@ -1,0 +1,35 @@
+{% extends 'dashboard.html' %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="mb-4 text-center">Health Providers</h1>
+        
+        {% if health_providers %}
+            <ul class="list-group">
+                {% for provider in health_providers %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ provider.name }}</strong> - {{ provider.type }} - {{ provider.phone }}
+                        </div>
+                        <form method="POST" action="{% url 'delete_health_provider' provider.id %}" style="display:inline;" onsubmit="return confirmDelete('{{ provider.name }}');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                        
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-center text-muted">No health providers found.</p>
+        {% endif %}
+
+        <div class="text-center mt-4">
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+    <script>
+        function confirmDelete(providerName) {
+            return confirm("Are you sure you want to delete '" + providerName + "'?");
+        }
+    </script>
+{% endblock %}

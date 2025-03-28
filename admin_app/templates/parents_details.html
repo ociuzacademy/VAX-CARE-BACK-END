@@ -1,0 +1,58 @@
+{% extends 'dashboard.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="mb-4 text-center">Parents List</h1>
+
+        {% if parents %}
+            <ul class="list-group">
+                {% for parent in parents %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>{{ parent.name }}</strong>
+                        <div>
+                            <button class="btn btn-primary btn-sm" onclick="showDetails('{{ parent.id }}')">View Details</button>
+                            <a href="{% url 'delete_parent' parent.id %}" class="btn btn-danger btn-sm" onclick="return confirmDelete('{{ parent.name }}');">Delete</a>
+                        </div>
+                    </li>
+
+                    <!-- Parent Details (Initially Hidden) -->
+                    <div id="details-{{ parent.id }}" class="parent-details card mt-3 p-3 border shadow-sm" style="display: none;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ parent.name }}</h5>
+                            <p class="card-text"><strong>Email:</strong> {{ parent.email }}</p>
+                            <p class="card-text"><strong>Phone:</strong> {{ parent.phone }}</p>
+                            <p class="card-text"><strong>Number of Children:</strong> {{ parent.no_of_children }}</p>
+                            <p class="card-text"><strong>Name of Children:</strong> 
+                                {% for child in parent.child_set.all %}
+                                    {{ child.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    No children found.
+                                {% endfor %}
+                            </p>
+                            
+                           
+                        </div>
+                    </div>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-warning text-center">No parents found.</div>
+        {% endif %}
+
+        <div class="text-center mt-4">
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        function showDetails(parentId) {
+            document.querySelectorAll(".parent-details").forEach(div => div.style.display = "none");
+            document.getElementById("details-" + parentId).style.display = "block";
+        }
+
+        function confirmDelete(parentName) {
+            return confirm("Are you sure you want to delete '" + parentName + "'?");
+        }
+    </script>
+    </script>
+{% endblock %}

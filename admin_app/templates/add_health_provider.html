@@ -1,0 +1,198 @@
+{% extends 'dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Add Health Provider</h2>
+
+    {% if messages %}
+    <div class="mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-center" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="card shadow p-4 mx-auto" style="max-width: 600px;">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="type" class="form-label">Type:</label>
+                <select name="type" class="form-select">
+                    <option value="Hospital">Hospital</option>
+                    <option value="Health Center">Health Center</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password:</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="address" class="form-label">Address:</label>
+                <textarea name="address" class="form-control" required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone:</label>
+                <input type="text" name="phone" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="latitude" class="form-label">Latitude:</label>
+                <input type="text" name="latitude" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="longitude" class="form-label">Longitude:</label>
+                <input type="text" name="longitude" class="form-control">
+            </div>
+
+
+
+            <div class="mb-3">
+                <label class="form-label">Choose Age Groups:</label>
+                <div class="age-group-container">
+                    {% for age_group_value, age_group_label in age_groups %}
+                    <div class="form-check">
+                        <input type="checkbox" name="age_group" value="{{ age_group_value }}"
+                            id="age_{{ forloop.counter }}" class="form-check-input age-group-checkbox">
+                        <label class="form-check-label" for="age_{{ forloop.counter }}">{{ age_group_label }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Vaccines (Automatically selected based on age group):</label>
+                <div id="vaccines-list" class="vaccines-container">
+                    <p class="placeholder-text">Select an age group to see vaccines.</p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">Add Health Provider</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkboxes = document.querySelectorAll(".age-group-checkbox");
+        const vaccinesList = document.getElementById("vaccines-list");
+
+        function updateVaccines() {
+            const selectedAgeGroups = Array.from(checkboxes)
+                .filter(checkbox => checkbox.checked)
+                .map(checkbox => checkbox.value);
+
+            if (selectedAgeGroups.length === 0) {
+                vaccinesList.innerHTML = "<p class='placeholder-text'>Select an age group to see vaccines.</p>";
+                return;
+            }
+
+            fetch("{% url 'get_vaccines' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                },
+                body: JSON.stringify({ age_groups: selectedAgeGroups })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    vaccinesList.innerHTML = "";
+                    if (data.vaccines && data.vaccines.length > 0) {
+                        let listHTML = "<ul class='list-group'>";
+                        data.vaccines.forEach(vaccine => {
+                            listHTML += `
+                        <li class="list-group-item">
+                            <strong>${vaccine.vaccine_name}</strong> - ${vaccine.administration}
+                            <br><small>Protection: ${vaccine.protection}</small>
+                            <br><small>Side Effects: ${vaccine.side_effects}</small>
+                        </li>`;
+                        });
+                        listHTML += "</ul>";
+                        vaccinesList.innerHTML = listHTML;
+                    } else {
+                        vaccinesList.innerHTML = "<p class='text-danger'>No vaccines found for the selected age groups.</p>";
+                    }
+                })
+                .catch(error => {
+                    vaccinesList.innerHTML = `<p class='text-danger'>Error loading vaccines. Please try again.</p>`;
+                });
+        }
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", updateVaccines);
+        });
+    });
+</script>
+
+<style>
+    .card {
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        background: #f8f9fa;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        padding: 12px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+    }
+
+    .form-label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .btn-success {
+        transition: background 0.3s ease, transform 0.2s ease;
+        font-weight: bold;
+        padding: 12px;
+    }
+
+    .btn-success:hover {
+        background: #3d8b40;
+        transform: scale(1.02);
+    }
+
+    #vaccines-list {
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+        min-height: 50px;
+    }
+
+    .alert {
+        font-size: 14px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}

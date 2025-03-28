@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Bookings</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h2>Admin Dashboard - Bookings</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Child Name</th>
+                <th>Parent</th>
+                <th>Age Group</th>
+                <th>Vaccines</th>
+                <th>Health Provider</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.child.name }}</td>
+                <td>{{ booking.parent.username }}</td>
+                <td>{{ booking.child.age_group }}</td>
+                <td>
+                    {% for vaccine in booking.vaccines %}
+                        {{ vaccine.vaccine_name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        No vaccines assigned
+                    {% endfor %}
+                </td>
+                <td>{{ booking.health_provider.name }}</td>
+                <td>{{ booking.date }}</td>
+                <td>{{ booking.status }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No bookings found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

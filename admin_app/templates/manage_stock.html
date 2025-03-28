@@ -1,0 +1,55 @@
+{% extends 'dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Manage Stock Requests</h2>
+
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Health Provider</th>
+                <th>Age Group</th>
+                <th>Quantity</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in stock_requests %}
+            <tr>
+                <td>{{ request.health_provider.name }}</td>
+                <td>{{ request.age_group }}</td>
+                <td>{{ request.quantity }}</td>
+                <td>
+                    {% if request.status == "Pending" %}
+                        <span class="badge bg-warning text-dark">{{ request.status }}</span>
+                    {% elif request.status == "Approved" %}
+                        <span class="badge bg-success">{{ request.status }}</span>
+                    {% elif request.status == "Rejected" %}
+                        <span class="badge bg-danger">{{ request.status }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if request.status == "Pending" %}
+                        <a href="{% url 'approve_stock_request' %}?id={{request.id}}" class="btn btn-success btn-sm">Approve</a>
+                        <a href="{% url 'reject_stock_request' %}?id={{request.id}}" class="btn btn-danger btn-sm">Reject</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if not stock_requests %}
+        <p class="text-center">No stock requests available.</p>
+    {% endif %}
+</div>
+{% endblock %}

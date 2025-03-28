@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap">
+</head>
+<body>
+    <div id="container" class="container">
+        <!-- FORM SECTION -->
+        <div class="row">
+            <!-- SIGN IN -->
+            <div class="col align-items-center flex-col sign-in">
+                <div class="form-wrapper align-items-center">
+                    <form id="loginForm" class="form sign-in" action="/login/" method="POST">
+                        <div class="input-group">
+                            <i class='bx bxs-user'></i>
+                            <input type="text" name="email" placeholder="Email" required>
+                        </div>
+                        <div class="input-group">
+                            <i class='bx bxs-lock-alt'></i>
+                            <input type="password" name="password" placeholder="Password" required>
+                        </div>
+                        <button type="submit">
+                            Sign in
+                        </button>
+                        <p id="error-message" style="color: red;"></p>
+                        <p><b>Forgot password?</b></p>
+                    </form>
+                </div>
+            </div>
+            <!-- END SIGN IN -->
+        </div>
+        <!-- END FORM SECTION -->
+        <!-- CONTENT SECTION -->
+        <div class="row content-row">
+            <div class="col align-items-center flex-col">
+                <div class="text sign-in">
+                    <h2>Welcome</h2>
+                </div>
+            </div>
+        </div>
+        <!-- END CONTENT SECTION -->
+    </div>
+
+    <style>
+ :root {
+    --primary-color: #4EA685;
+    --secondary-color: #57B894;
+    --black: #000000;
+    --white: #ffffff;
+    --gray: #efefef;
+    --gray-2: #757575;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(-45deg, var(--primary-color), var(--secondary-color));
+}
+
+.container {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    padding: 2rem;
+    background-color: var(--white);
+    border-radius: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    text-align: center;
+}
+
+/* Ensure inputs are visible */
+.input-group {
+    position: relative;
+    margin: 1rem 0;
+}
+
+.input-group i {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    font-size: 1.4rem;
+    color: var(--gray-2);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 1rem 3rem;
+    font-size: 1rem;
+    background-color: var(--gray);
+    border-radius: .5rem;
+    border: 2px solid var(--gray-2);
+    outline: none;
+}
+
+.input-group input:focus {
+    border: 2px solid var(--primary-color);
+    background-color: var(--white);
+}
+
+.form button {
+    cursor: pointer;
+    width: 100%;
+    padding: .6rem;
+    border-radius: .5rem;
+    border: none;
+    background-color: var(--primary-color);
+    color: var(--white);
+    font-size: 1.2rem;
+    outline: none;
+}
+
+.form button:hover {
+    background-color: var(--secondary-color);
+}
+
+p {
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+p b {
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+    </style>
+
+    <script>
+       document.addEventListener("DOMContentLoaded", function () {
+        const loginForm = document.getElementById("loginForm");
+
+        loginForm.addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            let email = loginForm.email.value.trim();
+            let password = loginForm.password.value.trim();
+
+            // Hardcoded login validation
+            if (email === "admin@gmail.com" && password === "admin") {
+                window.location.href = "dashboard/"; // Redirect to dashboard
+            } else {
+                document.getElementById("error-message").textContent = "Invalid login credentials";
+            }
+        });
+    });
+</script>
+</body>
+</html>

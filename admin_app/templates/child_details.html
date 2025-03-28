@@ -1,0 +1,41 @@
+{% extends 'dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Children List</h1>
+
+    {% if children %}
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Child Name</th>
+                    <th>Parent Name</th>
+                    <th>Date Of Birth</th>
+                    <th>Gender</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for child in children %}
+                <tr>
+                    <td><strong>{{ child.name }}</strong></td>
+                    <td>{{ child.parent.name }}</td> {# Show parent name #}
+                    <td>{{ child.birthdate }} </td>
+                    <td>{{ child.gender }}</td>
+                    <td>
+                        <a href="{% url 'delete_child' child.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="alert alert-warning">No children found.</p>
+    {% endif %}
+
+    <a href="{% url 'parent_list' %}" class="btn btn-secondary mt-3">Back to Parents</a>
+</div>
+{% endblock %}
