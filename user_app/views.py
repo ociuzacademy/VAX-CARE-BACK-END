@@ -90,6 +90,51 @@ class ChildViewSet(viewsets.ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST,
         )
     
+
+class UpdateParentProfile(generics.UpdateAPIView):
+    queryset = tbl_parent.objects.all()
+    serializer_class = ParentSerializer
+    http_method_names = ['patch']
+
+    def patch(self, request, *args, **kwargs):
+        parent_id = request.data.get('id')
+        if not parent_id:
+            return Response({"status": "failed", "message": "Parent ID is required."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        parent = get_object_or_404(tbl_parent, id=parent_id)
+        serializer = ParentSerializer(parent, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "success", "message": "Parent profile updated successfully", "data": serializer.data},
+                            status=status.HTTP_200_OK)
+        return Response({"status": "failed", "message": serializer.errors},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateChildProfile(generics.UpdateAPIView):
+    queryset = Child.objects.all()
+    serializer_class = ChildSerializer
+    http_method_names = ['patch']
+
+    def patch(self, request, *args, **kwargs):
+        child_id = request.data.get('id')
+        if not child_id:
+            return Response({"status": "failed", "message": "Child ID is required."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        child = get_object_or_404(Child, id=child_id)
+        serializer = ChildSerializer(child, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "success", "message": "Child profile updated successfully", "data": serializer.data},
+                            status=status.HTTP_200_OK)
+        return Response({"status": "failed", "message": serializer.errors},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
 class ViewChildListView(viewsets.ReadOnlyModelViewSet):
     queryset = Child.objects.all()
     serializer_class = ChildSerializer

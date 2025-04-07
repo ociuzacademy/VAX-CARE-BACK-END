@@ -13,31 +13,6 @@ from .views import *
 from .views import get_available_slots
 from rest_framework.routers import DefaultRouter
 from rest_framework.routers import DefaultRouter
-# Router setup
-# router = DefaultRouter()
-# router.register(r'register', ParentViewSet, basename='register')
-# router.register(r'children', ChildViewSet, basename='child')  
-
-# # Swagger schema view
-# schema_view = yasg_schema_view(
-#     openapi.Info(
-#         title="Parent API",
-#         default_version='v1',
-#         description="API for Parent Registration & Login",
-#     ),
-#     public=True,
-# )
-
-# urlpatterns = [
-#     path('', include(router.urls)),  # Includes all Parent endpoints
-#     path('login/', LoginView.as_view(), name='login'),
-    
-#     # Swagger documentation
-#     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-ui'),
-#     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='redoc-ui'),
-#     # path('request-stock/', request_stock, name='request_stock'),
-# ]
-# Swagger Schema Configuration
 schema_view = get_schema_view(
     openapi.Info(
         title="Vaxcare Jr API",
@@ -88,6 +63,8 @@ urlpatterns = [
     path('health_provider_list/',ListHealthProviderView.as_view({'get':'list'}),name='health_provider_list'),
     path('health_provider_details/',ViewHealthProviderDetailsView.as_view({'get':'list'}),name='health_provider_details'),
     path('vaccination_history/',VaccinationHistoryView.as_view({'get':'list'}),name='vaccination_history'),
+    path('update_parent_profile/',UpdateParentProfile.as_view(),name='update_parent_profile'),
+    path('update_child_profile/',UpdateChildProfile.as_view(),name='update_child_profile'),
 ]   
 
 
