@@ -304,10 +304,5 @@ def reject_stock_request(request):
     return redirect("manage_stock")  # Redirect back to the list
 
 def admin_bookings(request):
-    bookings = Booking.objects.all()
-    
-    for booking in bookings:
-        # Get all vaccines related to the selected age group
-        booking.vaccines = Vaccine.objects.filter(age_group=booking.child.age_group)
-
+    bookings = Booking.objects.prefetch_related('vaccines', 'child', 'parent', 'health_provider').all()
     return render(request, 'vaccine_bookings.html', {'bookings': bookings})

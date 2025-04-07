@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -18,8 +18,25 @@
         th {
             background-color: #f4f4f4;
         }
-    </style>
-</head>
+    </style> -->
+{% extends 'dashboard.html' %}
+
+{% block content %}
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
+    th {
+        background-color: #f4f4f4;
+    }
+</style>
 <body>
     <h2>Admin Dashboard - Bookings</h2>
     <table>
@@ -39,9 +56,9 @@
             <tr>
                 <td>{{ booking.child.name }}</td>
                 <td>{{ booking.parent.username }}</td>
-                <td>{{ booking.child.age_group }}</td>
+                <td>{{ booking.age_group }}</td>
                 <td>
-                    {% for vaccine in booking.vaccines %}
+                    {% for vaccine in booking.vaccines.all %}
                         {{ vaccine.vaccine_name }}{% if not forloop.last %}, {% endif %}
                     {% empty %}
                         No vaccines assigned
@@ -58,5 +75,6 @@
             {% endfor %}
         </tbody>
     </table>
-</body>
-</html>
+    {% endblock %}
+<!-- </body>
+</html> -->
